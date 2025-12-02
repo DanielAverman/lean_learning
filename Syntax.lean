@@ -74,3 +74,67 @@ structure Point_ where
 
 -- structure accessors
 #eval "one string".append " and another"
+
+
+----------------------
+------ Datatypes -----
+----------------------
+inductive Bool_ where
+  | false : Bool_
+  | true : Bool_
+
+def isZero (n : Nat) : Bool :=
+  match n with
+  | Nat.zero => true
+  | Nat.succ k => false
+
+#eval Nat.succ 5
+
+-- define function for even
+def even (n : Nat) : Bool :=
+  match n with
+  | Nat.zero => true
+  | Nat.succ k => not (even k)
+
+
+----------------------
+--- Polymorphism -----
+----------------------
+-- Polymorphic in sense that it can use any type
+-- A polymorphic version of Point
+structure PPoint (α : Type) where
+  x : α
+  y : α
+
+  def natOrigin : PPoint Nat :=
+  { x := Nat.zero, y := Nat.zero }
+
+--o work with any polymorphic point, it must be polymorphic itself
+  def replaceX (α : Type) (point : PPoint α) (newX : α) : PPoint α :=
+  { point with x := newX }
+
+  -- Linked Lists
+  -- following lists are the same
+  def primesUnder10 : List Nat := [2, 3, 5, 7]
+  def explicitPrimesUnder10 : List Nat :=
+  List.cons 2 (List.cons 3 (List.cons 5 (List.cons 7 List.nil)))
+
+  -- example of the function length
+  def length (α : Type) (xs : List α) : Nat :=
+  match xs with
+  | List.nil => Nat.zero
+  | List.cons y ys => Nat.succ (length α ys)
+  -- amother example
+  def length_ (α : Type) (xs : List α) : Nat :=
+  match xs with
+  | [] => 0
+  | y :: ys => Nat.succ (length α ys)
+
+  -- implicit arguments
+  def replaceX_ {α : Type} (point : PPoint α) (newX : α) : PPoint α :=
+  { point with x := newX }
+  #eval replaceX_ natOrigin 5
+
+  #eval primesUnder10.head?
+  --#eval [].head? -- provides errors
+  #eval [].head? (α := Int)
